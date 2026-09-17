@@ -1,16 +1,24 @@
 # Whisper Desktop — Publicación
-# Descarga FFmpeg (essentials), publica la app self-contained win-x64 e incluye ffmpeg.exe.
+# Publica la app self-contained win-x64, incluye FFmpeg y genera el MSI (WiX).
+
+param(
+    [string]$Version = "1.0.0"
+)
 
 $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
+$RepoRoot = Split-Path -Parent $Root
 $Project = Join-Path $Root "src\WhisperDesktop\WhisperDesktop.csproj"
+$InstallerWxs = Join-Path $Root "installer\Package.wxs"
 $FfmpegDir = Join-Path $PSScriptRoot "ffmpeg"
 $PublishDir = Join-Path $Root "dist\WhisperDesktop"
+$DistDir = Join-Path $Root "dist"
+$MsiPath = Join-Path $DistDir "WhisperDesktop-Setup.msi"
 $TempDir = Join-Path $env:TEMP "WhisperDesktop-build"
 
-Write-Host "==> Whisper Desktop publish" -ForegroundColor Cyan
-New-Item -ItemType Directory -Force -Path $FfmpegDir, $TempDir, $PublishDir | Out-Null
+Write-Host "==> Whisper Desktop publish v$Version" -ForegroundColor Cyan
+New-Item -ItemType Directory -Force -Path $FfmpegDir, $TempDir, $DistDir | Out-Null
 
 # --- FFmpeg ---
 $ffmpegExe = Join-Path $FfmpegDir "ffmpeg.exe"
@@ -18,7 +26,6 @@ $ffprobeExe = Join-Path $FfmpegDir "ffprobe.exe"
 
 if (-not (Test-Path $ffmpegExe) -or -not (Test-Path $ffprobeExe)) {
     Write-Host "==> Descargando FFmpeg (GitHub BtbN)…" -ForegroundColor Yellow
-    # Build essentials-like shared win64 from BtbN (más estable que el zip de gyan)
     $zipUrl = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
     $zipPath = Join-Path $TempDir "ffmpeg-win64.zip"
 
@@ -53,23 +60,56 @@ dotnet publish $Project `
     --self-contained true `
     -o $PublishDir `
     -p:PublishSingleFile=false `
+    -p:Version=$Version `
     -p:IncludeNativeLibrariesForSelfExtract=true
 
-# Asegurar ffmpeg en la salida
 $outFfmpeg = Join-Path $PublishDir "ffmpeg"
 New-Item -ItemType Directory -Force -Path $outFfmpeg | Out-Null
 Copy-Item $ffmpegExe (Join-Path $outFfmpeg "ffmpeg.exe") -Force
 Copy-Item $ffprobeExe (Join-Path $outFfmpeg "ffprobe.exe") -Force
 
-# Copiar guía de usuario
-$readmeSrc = Join-Path $Root "README.md"
-if (Test-Path $readmeSrc) {
-    Copy-Item $readmeSrc (Join-Path $PublishDir "LEEME.txt") -Force
+# --- MSI (WiX) ---
+Write-Host "==> Generando MSI con WiX…" -ForegroundColor Yellow
+
+# Preferir WiX 5 desde dotnet tools (evita OSMF EULA de WiX 7)
+$dotnetWix = Join-Path $env:USERPROFILE ".dotnet\tools\wix.exe"
+if (Test-Path $dotnetWix) {
+    $wixCmd = $dotnetWix
+} else {
+    $wixOnPath = Get-Command wix -ErrorAction SilentlyContinue
+    if (-not $wixOnPath) {
+        throw "No se encontró 'wix'. Instalá: dotnet tool install --global wix --version 5.0.2"
+    }
+    $wixCmd = $wixOnPath.Source
+}
+
+Write-Host "    Usando: $wixCmd"
+
+Push-Location (Join-Path $Root "installer")
+try {
+    & $wixCmd extension add "WixToolset.UI.wixext/5.0.2"
+    & $wixCmd build `
+        .\Package.wxs `
+        -ext WixToolset.UI.wixext `
+        -arch x64 `
+        -d "Version=$Version" `
+        -bindpath "publish=$PublishDir" `
+        -out $MsiPath
+    if ($LASTEXITCODE -ne 0) {
+        throw "wix build falló con código $LASTEXITCODE"
+    }
+} finally {
+    Pop-Location
+}
+
+if (-not (Test-Path $MsiPath)) {
+    throw "No se generó el MSI en $MsiPath"
 }
 
 Write-Host ""
-Write-Host "Listo. Carpeta para distribuir:" -ForegroundColor Green
-Write-Host "  $PublishDir"
+Write-Host "Listo." -ForegroundColor Green
+Write-Host "  App:  $PublishDir"
+Write-Host "  MSI:  $MsiPath"
 Write-Host ""
-Write-Host "El usuario abre WhisperDesktop.exe (no necesita instalar .NET ni Docker)."
-Write-Host "La primera transcripción descargará el modelo de Whisper (~140 MB para Base)."
+Write-Host "Para publicar en GitHub Releases:"
+Write-Host "  gh release create v$Version `"$MsiPath`" --title `"Whisper Desktop v$Version`" --notes `"Instalador Windows (MSI).`""

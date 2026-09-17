@@ -11,10 +11,14 @@ transcriptions/
 # App publicada y binarios
 desktop/dist/
 desktop/tools/ffmpeg/
+desktop/installer/wixext/
 **/bin/
 **/obj/
 *.user
 .vs/
+*.msi
+*.wixpdb
+
 
 # Modelos / temporales de Whisper Desktop
 **/models/

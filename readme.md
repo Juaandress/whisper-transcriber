@@ -1,103 +1,143 @@
-# Whisper Transcriber - Local Video Transcription with Docker
+# Whisper Transcriber
 
-This project enables transcription of local videos and audio files using OpenAI's *Whisper* model running inside a Docker container. All processing happens *locally*, with no data uploaded to the cloud, ensuring your content’s privacy.
+Transcripción **local** de audio y video con [OpenAI Whisper](https://github.com/openai/whisper).  
+Tu contenido no se sube a la nube.
 
-**Also available:** a Windows desktop app for non-technical users in [`desktop/`](desktop/README.md) (no Docker required). Open `desktop\dist\WhisperDesktop\WhisperDesktop.exe` after running `desktop\tools\publish.ps1`.
-
-**Supported formats:** video (`.mp4`, `.mkv`, `.mov`, `.avi`, `.webm`) and audio (`.m4a`, `.mp3`, `.wav`, `.flac`, `.ogg`, `.aac`).
-
----
-
-## Features
-
-- Extracts/converts audio with ffmpeg.
-- Transcribes with Whisper (default base model).
-- Supports common video and audio formats (including `.m4a`).
-- Saves transcriptions as plain text (.txt) files in a local folder.
-- Easy to use with Docker—no need to install Python or dependencies on the host machine.
-- Configurable for different models and languages.
-- Optional Windows app (WPF) with drag-and-drop and live progress.
+| | |
+|---|---|
+| **App Windows** | Instalador MSI (recomendado para usuarios finales) |
+| **Docker** | Alternativa por línea de comandos |
+| **Licencia** | [MIT](LICENSE) |
 
 ---
 
-## Prerequisites
+## Descargar para Windows (MSI)
 
-- [Docker](https://docs.docker.com/get-docker/) installed on your system.
-- Sufficient disk space for videos and transcription files.
-- Media files in supported video/audio formats (see above).
+[![Descargar MSI](https://img.shields.io/github/v/release/Juaandress/whisper-transcriber?label=Descargar%20MSI&logo=windows)](https://github.com/Juaandress/whisper-transcriber/releases/latest/download/WhisperDesktop-Setup.msi)
+
+**[⬇️ Descargar WhisperDesktop-Setup.msi](https://github.com/Juaandress/whisper-transcriber/releases/latest/download/WhisperDesktop-Setup.msi)**
+
+1. Descargá el instalador `.msi`
+2. Ejecutalo (Windows 10/11, 64 bits)
+3. Abrí **Whisper Desktop** desde el menú Inicio
+4. Arrastrá un archivo de audio o video y tocá **Transcribir**
+
+La primera vez descarga el modelo Whisper (~140 MB). Después funciona offline.
+
+> El MSI se publica en [GitHub Releases](https://github.com/Juaandress/whisper-transcriber/releases) (práctica recomendada: no versionar binarios en el repo).
+
+### Formatos soportados
+
+**Video:** `.mp4` `.mkv` `.mov` `.avi` `.webm`  
+**Audio:** `.m4a` `.mp3` `.wav` `.flac` `.ogg` `.aac`
 
 ---
 
-## Project Structure
+## Requisitos
 
-whisper-transcriber/
-├── Dockerfile
-├── entrypoint.sh
-├── videos/ # Folder to place your videos
-├── transcriptions/ # Folder where transcriptions will be saved
-└── README.md
+### App Windows
+- Windows 10 u 11 (x64)
+- ~2–4 GB libres (modelo + temporales)
+- Internet solo la primera vez (descarga del modelo)
+
+### Docker (opcional)
+- [Docker Desktop](https://docs.docker.com/get-docker/)
 
 ---
 
-## How to Use
+## Desarrollo (.NET)
 
-### 1. Clone or download the project
+Stack de la app de escritorio:
 
-git clone <https://your-repository.git>
+- .NET 8 / WPF
+- [Whisper.net](https://github.com/sandrohanea/whisper.net) (whisper.cpp)
+- FFmpeg embebido
+- Instalador con [WiX Toolset](https://wixtoolset.org/)
+
+### Requisitos para compilar
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [WiX CLI](https://wixtoolset.org/) (`winget install WiXToolset.WiXCLI`)
+
+### Ejecutar en desarrollo
+
+```powershell
+cd desktop
+dotnet run --project src\WhisperDesktop\WhisperDesktop.csproj
+```
+
+### Publicar app + MSI
+
+```powershell
+cd desktop\tools
+.\publish.ps1 -Version 1.0.0
+```
+
+Salida:
+
+- `desktop\dist\WhisperDesktop\` — carpeta portable
+- `desktop\dist\WhisperDesktop-Setup.msi` — instalador
+
+### Crear una release en GitHub
+
+```powershell
+gh release create v1.0.0 desktop\dist\WhisperDesktop-Setup.msi `
+  --title "Whisper Desktop v1.0.0" `
+  --notes "Instalador Windows (MSI)."
+```
+
+También podés etiquetar `v1.0.0` y empujar: el workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) genera el MSI automáticamente.
+
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+---
+
+## Uso con Docker
+
+```powershell
+git clone https://github.com/Juaandress/whisper-transcriber.git
 cd whisper-transcriber
-
-### 2. Create folders for videos and transcriptions
-
-mkdir -p videos transcriptions
-
-### 3. Place your media files inside the videos folder
-
-Copy or move your video/audio files (e.g. `.mp4`, `.m4a`, `.mp3`) into videos/.
-
-### 4. Build the Docker image
-
+mkdir videos, transcriptions
+# Copiá tus archivos a videos\
 docker build -t whisper-transcriber .
-
-### 5. Run the container to process the videos
-
-Windows (PowerShell):
-
 docker run --rm -v "${PWD}\videos:/app/videos" -v "${PWD}\transcriptions:/app/transcriptions" whisper-transcriber
+```
 
-macOS/Linux (Bash):
+En macOS/Linux usá `$(pwd)` en lugar de `${PWD}`.
 
-docker run --rm -v "$(pwd)/videos:/app/videos" -v "$(pwd)/transcriptions:/app/transcriptions" whisper-transcriber
+- Idioma por defecto: español (`--language es` en `entrypoint.sh`)
+- Modelo por defecto: `base`
 
-- The container will look for media in /app/videos (mounted from your local videos folder).
-- It will convert/extract audio and generate transcriptions under /app/transcriptions.
-- Transcription .txt files will have the same base name as the original files.
+---
 
-### Customization
+## Estructura del repositorio
 
-- Change Whisper model: Edit entrypoint.sh and modify the --model base parameter to tiny, small, medium, or large depending on your hardware and accuracy needs.
-- Language is set to Spanish (`--language es`) by default. Change or remove that flag in entrypoint.sh if you need another language or auto-detection.
+```
+whisper-transcriber/
+├── dockerfile / entrypoint.sh   # Flujo Docker
+├── desktop/
+│   ├── src/WhisperDesktop/      # App WPF (.NET 8)
+│   ├── installer/Package.wxs    # Definición del MSI (WiX)
+│   └── tools/publish.ps1        # Publish + MSI
+├── .github/workflows/release.yml
+├── LICENSE
+└── README.md
+```
 
-### Important Notes
+Las carpetas `videos/` y `transcriptions/` son locales (ignoradas por git).
 
-- The entire process runs locally; no data leaves your machine.
-- Transcription accuracy depends on audio quality and the model used.
-- You can process multiple files at once by placing them all in the videos folder.
-- Ensure you have enough disk space for temporary files and output.
+---
 
-### Example Output
+## Privacidad
 
-For a file named meeting.m4a (or meeting.mp4), after running the container you will get:
+Todo el procesamiento ocurre en tu máquina. Solo se descarga el modelo de Whisper la primera vez (desde Hugging Face / repositorio oficial de ggml).
 
-#### transcriptions/meeting.txt
+---
 
-Containing the plain text transcription.
+## Licencia
 
-### Support and Contributions
-
-If you encounter any issues or want to suggest improvements, feel free to open an issue or pull request in the repository.
-
-### License
-
-This project is free for personal and corporate use. The Whisper model is open source under the MIT license.
-
-Enjoy secure, private, and local transcription!
+MIT — ver [LICENSE](LICENSE).  
+Whisper / whisper.cpp tienen sus propias licencias open source.

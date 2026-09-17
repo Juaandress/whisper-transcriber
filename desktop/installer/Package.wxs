@@ -1,0 +1,53 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="Whisper Desktop"
+           Manufacturer="Juaandress"
+           Version="$(Version)"
+           UpgradeCode="8F3C2A1B-4D5E-6F70-8192-A3B4C5D6E7F8"
+           Scope="perMachine"
+           Language="3082">
+
+    <SummaryInformation Description="Transcripción local de audio y video con Whisper"
+                        Manufacturer="Juaandress" />
+
+    <MajorUpgrade DowngradeErrorMessage="Ya hay una versión más reciente de Whisper Desktop instalada." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Whisper Desktop" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="AppMenuFolder" Name="Whisper Desktop" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Files Include="!(bindpath.publish)\**" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="Shortcuts" Directory="AppMenuFolder">
+      <Component Id="StartMenuShortcut" Guid="9A8B7C6D-5E4F-3A2B-1C0D-9E8F7A6B5C4D">
+        <Shortcut Id="AppShortcut"
+                  Name="Whisper Desktop"
+                  Description="Transcribir audio y video localmente"
+                  Target="[INSTALLFOLDER]WhisperDesktop.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveAppMenuFolder" Directory="AppMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\Juaandress\WhisperDesktop"
+                       Name="Installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="Main" Title="Whisper Desktop" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentGroupRef Id="Shortcuts" />
+    </Feature>
+
+    <ui:WixUI Id="WixUI_Minimal" />
+  </Package>
+</Wix>
