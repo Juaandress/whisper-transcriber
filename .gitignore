@@ -1,0 +1,26 @@
+# Media y salidas locales (no subir a GitHub)
+videos/
+transcriptions/
+*.m4a
+*.mp3
+*.mp4
+*.mkv
+*.wav
+*.flac
+
+# App publicada y binarios
+desktop/dist/
+desktop/tools/ffmpeg/
+**/bin/
+**/obj/
+*.user
+.vs/
+
+# Modelos / temporales de Whisper Desktop
+**/models/
+*.bin
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
