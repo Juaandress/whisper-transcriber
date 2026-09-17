@@ -1,0 +1,164 @@
+﻿<Window x:Class="WhisperDesktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:WhisperDesktop.ViewModels"
+        Title="Whisper Desktop — Transcripción local"
+        Height="720" Width="980"
+        MinHeight="560" MinWidth="760"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver"
+        Background="{StaticResource AppBackground}">
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="160"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Whisper Desktop"
+                       FontSize="28" FontWeight="SemiBold"
+                       Foreground="{StaticResource TextPrimary}"/>
+            <TextBlock Text="Transcribí audio y video en tu PC. Nada se sube a la nube."
+                       FontSize="14" Margin="0,4,0,0"
+                       Foreground="{StaticResource TextSecondary}"/>
+        </StackPanel>
+
+        <!-- Controls -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="16" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <TextBlock Text="Idioma" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Languages}"
+                              SelectedItem="{Binding SelectedLanguage}"
+                              Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Grid.Column="2">
+                    <TextBlock Text="Modelo" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Models}"
+                              SelectedItem="{Binding SelectedModel}"
+                              Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Grid.Column="4">
+                    <TextBlock Text="Carpeta de salida" Style="{StaticResource FieldLabel}"/>
+                    <DockPanel Margin="0,4,0,0">
+                        <Button DockPanel.Dock="Right" Content="…" Width="36" Margin="6,0,0,0"
+                                Command="{Binding ChooseOutputFolderCommand}" ToolTip="Elegir carpeta"/>
+                        <TextBox Text="{Binding OutputDirectory, UpdateSourceTrigger=PropertyChanged}"
+                                 VerticalContentAlignment="Center"/>
+                    </DockPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,14,0,0">
+                    <Button Content="Elegir archivos" Command="{Binding ChooseFilesCommand}"
+                            Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
+                    <Button Content="Transcribir" Command="{Binding StartCommand}"
+                            Style="{StaticResource AccentButton}" Margin="0,0,8,0"/>
+                    <Button Content="Cancelar" Command="{Binding CancelCommand}" Margin="0,0,8,0"/>
+                    <Button Content="Abrir carpeta de salida" Command="{Binding OpenOutputFolderCommand}" Margin="0,0,8,0"/>
+                    <Button Content="Limpiar finalizados" Command="{Binding ClearCompletedCommand}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.ColumnSpan="5"
+                           Text="{Binding FfmpegStatus}"
+                           Foreground="{StaticResource TextSecondary}"
+                           FontSize="12" Margin="0,10,0,0" TextWrapping="Wrap"/>
+            </Grid>
+        </Border>
+
+        <!-- Drop zone + job list -->
+        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="#F0F4F1" BorderBrush="#C5D0C8" BorderThickness="0,0,0,1" Padding="16">
+                    <TextBlock Text="Arrastrá y soltá archivos aquí (.mp4, .m4a, .mp3, .wav, .mkv, …)"
+                               HorizontalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"/>
+                </Border>
+
+                <ListView Grid.Row="1" ItemsSource="{Binding Jobs}" BorderThickness="0"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="12,8"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                    <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding StatusMessage}" Foreground="#556B5F"
+                                               FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                    <ProgressBar Height="6" Margin="0,6,0,0"
+                                                 Minimum="0" Maximum="100"
+                                                 Value="{Binding Progress}"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding StatusDisplay}"
+                                           VerticalAlignment="Center" FontWeight="Medium"/>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Abrir .txt"
+                                            Command="{Binding DataContext.OpenJobOutputCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Margin="0,0,6,0"
+                                            IsEnabled="{Binding OutputPath, Converter={StaticResource NullToBoolConverter}}"/>
+                                </StackPanel>
+                                <Button Grid.Column="3" Content="Quitar"
+                                        Command="{Binding DataContext.RemoveJobCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
+
+        <TextBlock Grid.Row="3" Text="Actividad" Style="{StaticResource FieldLabel}" Margin="0,12,0,6"/>
+
+        <TextBox Grid.Row="4"
+                 Text="{Binding StatusLog}"
+                 IsReadOnly="True"
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"
+                 FontFamily="Consolas"
+                 FontSize="12"
+                 Background="#F7F7F5"
+                 BorderBrush="#D0D5D2"/>
+    </Grid>
+</Window>

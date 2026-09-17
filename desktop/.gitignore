@@ -1,0 +1,7 @@
+# Ignorar salidas de build y binarios descargados
+**/bin/
+**/obj/
+dist/
+tools/ffmpeg/
+*.user
+.vs/
