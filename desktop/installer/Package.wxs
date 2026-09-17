@@ -83,6 +83,7 @@
                   Return="asyncNoWait" />
 
     <ui:WixUI Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 
     <UI Id="CustomInstallUi">
       <!-- Diálogo propio: ofrecer acceso directo en el escritorio -->

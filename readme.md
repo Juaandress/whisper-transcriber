@@ -9,7 +9,7 @@ Tu contenido **no se sube a la nube**: todo corre en tu PC.
 | **[Docker](#uso-con-docker)** | Quienes prefieren línea de comandos / servidores |
 | **[Desarrollo .NET](#desarrollo-net)** | Quienes quieren compilar o contribuir |
 
-**Licencia:** [MIT](LICENSE)
+**Licencia:** [MIT](LICENSE) · [Términos](docs/TERMINOS.md) · [Privacidad](docs/PRIVACIDAD.md)
 
 ---
 
@@ -26,7 +26,8 @@ Tu contenido **no se sube a la nube**: todo corre en tu PC.
 9. [Uso con Docker](#uso-con-docker)
 10. [Desarrollo (.NET)](#desarrollo-net)
 11. [Estructura del repositorio](#estructura-del-repositorio)
-12. [Privacidad](#privacidad)
+12. [Términos y privacidad](#términos-y-privacidad)
+13. [Privacidad (resumen)](#privacidad)
 
 ---
 
@@ -47,6 +48,7 @@ Tu contenido **no se sube a la nube**: todo corre en tu PC.
 1. Descargá el archivo `WhisperDesktop-Setup.msi` desde el enlace de arriba (o desde [Releases](https://github.com/Juaandress/whisper-transcriber/releases)).
 2. Abrilo con doble clic.
 3. Seguí el asistente:
+   - Aceptá el resumen de **términos de uso**.
    - Podés marcar o desmarcar **Crear acceso directo en el escritorio** (viene marcado).
    - Al final, dejá marcado **Abrir Whisper Desktop** para que se inicie al terminar.
 4. Si no lo abriste al final, buscá **Whisper Desktop** en el menú Inicio o en el escritorio.
@@ -335,7 +337,10 @@ git push origin v1.0.0
 whisper-transcriber/
 ├── dockerfile                 # Imagen Docker
 ├── entrypoint.sh              # Script de transcripción en el contenedor
-├── docs/images/               # Capturas de pantalla para el README
+├── docs/
+│   ├── images/                # Capturas de pantalla
+│   ├── TERMINOS.md            # Términos y condiciones
+│   └── PRIVACIDAD.md          # Política de privacidad
 ├── desktop/
 │   ├── src/WhisperDesktop/    # App WPF (.NET 8)
 │   ├── installer/Package.wxs  # Definición del MSI (WiX)
@@ -346,6 +351,18 @@ whisper-transcriber/
 ```
 
 Las carpetas `videos/` y `transcriptions/` son solo locales (están en `.gitignore`).
+
+---
+
+## Términos y privacidad
+
+Antes de usar o distribuir la app, revisá:
+
+- [Términos y Condiciones](docs/TERMINOS.md) — uso permitido, ausencia de garantías, limitación de responsabilidad  
+- [Política de Privacidad](docs/PRIVACIDAD.md) — procesamiento local, descargas de modelos, terceros  
+- [Licencia MIT](LICENSE)
+
+Durante la instalación del MSI se muestra un resumen legal para aceptar. En la app, los enlaces **Términos / Privacidad / Licencia MIT** están en el encabezado.
 
 ---
 

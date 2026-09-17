@@ -150,6 +150,24 @@ public partial class MainViewModel : ObservableObject
         RefreshFfmpegStatus();
     }
 
+    [RelayCommand]
+    private void OpenTerms() => OpenUrl("https://github.com/Juaandress/whisper-transcriber/blob/main/docs/TERMINOS.md");
+
+    [RelayCommand]
+    private void OpenPrivacy() => OpenUrl("https://github.com/Juaandress/whisper-transcriber/blob/main/docs/PRIVACIDAD.md");
+
+    [RelayCommand]
+    private void OpenLicense() => OpenUrl("https://github.com/Juaandress/whisper-transcriber/blob/main/LICENSE");
+
+    private static void OpenUrl(string url)
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true
+        });
+    }
+
     private void RefreshFfmpegStatus()
     {
         if (_runner.FfmpegAvailable)
