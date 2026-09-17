@@ -46,8 +46,10 @@ Tu contenido **no se sube a la nube**: todo corre en tu PC.
 
 1. Descargá el archivo `WhisperDesktop-Setup.msi` desde el enlace de arriba (o desde [Releases](https://github.com/Juaandress/whisper-transcriber/releases)).
 2. Abrilo con doble clic.
-3. Seguí el asistente de instalación (podés necesitar permisos de administrador).
-4. Cuando termine, buscá **Whisper Desktop** en el menú Inicio y abrilo.
+3. Seguí el asistente:
+   - Podés marcar o desmarcar **Crear acceso directo en el escritorio** (viene marcado).
+   - Al final, dejá marcado **Abrir Whisper Desktop** para que se inicie al terminar.
+4. Si no lo abriste al final, buscá **Whisper Desktop** en el menú Inicio o en el escritorio.
 
 Para desinstalar: *Configuración → Aplicaciones → Whisper Desktop → Desinstalar*.
 

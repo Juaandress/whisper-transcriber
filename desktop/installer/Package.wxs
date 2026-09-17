@@ -22,11 +22,13 @@
       <Directory Id="AppMenuFolder" Name="Whisper Desktop" />
     </StandardDirectory>
 
+    <StandardDirectory Id="DesktopFolder" />
+
     <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
       <Files Include="!(bindpath.publish)\**" />
     </ComponentGroup>
 
-    <ComponentGroup Id="Shortcuts" Directory="AppMenuFolder">
+    <ComponentGroup Id="StartMenuShortcuts" Directory="AppMenuFolder">
       <Component Id="StartMenuShortcut" Guid="9A8B7C6D-5E4F-3A2B-1C0D-9E8F7A6B5C4D">
         <Shortcut Id="AppShortcut"
                   Name="Whisper Desktop"
@@ -36,7 +38,24 @@
         <RemoveFolder Id="RemoveAppMenuFolder" Directory="AppMenuFolder" On="uninstall" />
         <RegistryValue Root="HKCU"
                        Key="Software\Juaandress\WhisperDesktop"
-                       Name="Installed"
+                       Name="StartMenuShortcut"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="DesktopShortcuts" Directory="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="B2C3D4E5-F6A7-8901-BCDE-F12345678901"
+                 Condition="INSTALLDESKTOPSHORTCUT = 1">
+        <Shortcut Id="DesktopAppShortcut"
+                  Name="Whisper Desktop"
+                  Description="Transcribir audio y video localmente"
+                  Target="[INSTALLFOLDER]WhisperDesktop.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\Juaandress\WhisperDesktop"
+                       Name="DesktopShortcut"
                        Type="integer"
                        Value="1"
                        KeyPath="yes" />
@@ -45,9 +64,54 @@
 
     <Feature Id="Main" Title="Whisper Desktop" Level="1">
       <ComponentGroupRef Id="AppFiles" />
-      <ComponentGroupRef Id="Shortcuts" />
+      <ComponentGroupRef Id="StartMenuShortcuts" />
+      <ComponentGroupRef Id="DesktopShortcuts" />
     </Feature>
 
+    <!-- Marcado por defecto; el usuario puede desmarcar en el diálogo de instalación -->
+    <Property Id="INSTALLDESKTOPSHORTCUT" Value="1" Secure="yes" />
+
+    <!-- Al finalizar: checkbox para abrir la app (marcado por defecto) -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Abrir Whisper Desktop" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+
+    <CustomAction Id="LaunchApplication"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="WhisperDesktop.exe"
+                  Execute="immediate"
+                  Impersonate="yes"
+                  Return="asyncNoWait" />
+
     <ui:WixUI Id="WixUI_Minimal" />
+
+    <UI Id="CustomInstallUi">
+      <!-- Diálogo propio: ofrecer acceso directo en el escritorio -->
+      <Dialog Id="DesktopShortcutDlg" Width="370" Height="270" Title="Whisper Desktop">
+        <Control Id="Title" Type="Text" X="15" Y="10" Width="340" Height="20"
+                 Text="{\WixUI_Font_Title}Acceso directo en el escritorio" />
+        <Control Id="Description" Type="Text" X="25" Y="45" Width="320" Height="50"
+                 Text="Podés crear un icono en el escritorio para abrir Whisper Desktop más rápido. El acceso del menú Inicio se crea siempre." />
+        <Control Id="DesktopCheck" Type="CheckBox" X="25" Y="110" Width="320" Height="17"
+                 Property="INSTALLDESKTOPSHORTCUT" CheckBoxValue="1"
+                 Text="Crear acceso directo en el escritorio" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="Atrás">
+          <Publish Event="NewDialog" Value="WelcomeDlg" />
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Siguiente">
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancelar">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+      </Dialog>
+
+      <!-- Welcome → nuestro diálogo → VerifyReady -->
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DesktopShortcutDlg" Order="10" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DesktopShortcutDlg" Order="10" />
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
+    </UI>
   </Package>
 </Wix>
