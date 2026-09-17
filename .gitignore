@@ -17,8 +17,7 @@ desktop/installer/.wix/
 
 
 
-# Modelos / temporales de Whisper Desktop
-**/models/
+# Modelos ggml descargados (no confundir con desktop/.../Models/ del código C#)
 *.bin
 
 # OS
