@@ -53,9 +53,21 @@ Para desinstalar: *Configuración → Aplicaciones → Whisper Desktop → Desin
 
 > El MSI se publica en GitHub Releases. No hace falta clonar el repositorio si solo querés usar la app.
 
+![Vista previa de Whisper Desktop](docs/images/app-inicio.png)
+
 ---
 
 ## Cómo usar la app
+
+### Vista general
+
+Pantalla principal al abrir la aplicación:
+
+![Whisper Desktop — pantalla de inicio](docs/images/app-inicio.png)
+
+Archivo agregado a la cola, listo para transcribir:
+
+![Whisper Desktop — archivo en cola](docs/images/app-con-archivo.png)
 
 ### Pasos básicos
 
@@ -314,6 +326,7 @@ git push origin v1.0.0
 whisper-transcriber/
 ├── dockerfile                 # Imagen Docker
 ├── entrypoint.sh              # Script de transcripción en el contenedor
+├── docs/images/               # Capturas de pantalla para el README
 ├── desktop/
 │   ├── src/WhisperDesktop/    # App WPF (.NET 8)
 │   ├── installer/Package.wxs  # Definición del MSI (WiX)
