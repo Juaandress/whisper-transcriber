@@ -30,9 +30,98 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<ModelOption> Models { get; } =
     [
-        new("tiny", "Tiny (rápido, menos preciso)", GgmlType.Tiny, "ggml-tiny.bin"),
-        new("base", "Base (recomendado)", GgmlType.Base, "ggml-base.bin"),
-        new("small", "Small (más preciso, más lento)", GgmlType.Small, "ggml-small.bin"),
+        new()
+        {
+            Id = "tiny",
+            DisplayName = "Tiny",
+            GgmlType = GgmlType.Tiny,
+            FileName = "ggml-tiny.bin",
+            SizeLabel = "~75 MB",
+            SpeedLabel = "Muy rápida",
+            QualityLabel = "Básica",
+            SpeedScore = 5,
+            QualityScore = 1,
+            Description = "Ideal para pruebas rápidas. Puede fallar con audio difícil."
+        },
+        new()
+        {
+            Id = "base",
+            DisplayName = "Base",
+            GgmlType = GgmlType.Base,
+            FileName = "ggml-base.bin",
+            SizeLabel = "~140 MB",
+            SpeedLabel = "Rápida",
+            QualityLabel = "Buena",
+            SpeedScore = 4,
+            QualityScore = 2,
+            Description = "Buen equilibrio para el día a día.",
+            IsRecommended = true
+        },
+        new()
+        {
+            Id = "small",
+            DisplayName = "Small",
+            GgmlType = GgmlType.Small,
+            FileName = "ggml-small.bin",
+            SizeLabel = "~460 MB",
+            SpeedLabel = "Moderada",
+            QualityLabel = "Muy buena",
+            SpeedScore = 3,
+            QualityScore = 3,
+            Description = "Mejor con ruido, acentos o nombres propios."
+        },
+        new()
+        {
+            Id = "medium",
+            DisplayName = "Medium",
+            GgmlType = GgmlType.Medium,
+            FileName = "ggml-medium.bin",
+            SizeLabel = "~1,5 GB",
+            SpeedLabel = "Lenta",
+            QualityLabel = "Alta",
+            SpeedScore = 2,
+            QualityScore = 4,
+            Description = "Más precisa. Pedí paciencia en CPU y varios GB libres."
+        },
+        new()
+        {
+            Id = "large-v2",
+            DisplayName = "Large v2",
+            GgmlType = GgmlType.LargeV2,
+            FileName = "ggml-large-v2.bin",
+            SizeLabel = "~3 GB",
+            SpeedLabel = "Muy lenta",
+            QualityLabel = "Muy alta",
+            SpeedScore = 1,
+            QualityScore = 5,
+            Description = "Máxima calidad clásica. Descarga y proceso pesados."
+        },
+        new()
+        {
+            Id = "large-v3",
+            DisplayName = "Large v3",
+            GgmlType = GgmlType.LargeV3,
+            FileName = "ggml-large-v3.bin",
+            SizeLabel = "~3 GB",
+            SpeedLabel = "Muy lenta",
+            QualityLabel = "Máxima",
+            SpeedScore = 1,
+            QualityScore = 5,
+            Description = "La mejor calidad general de Whisper. Exige máquina potente o mucha paciencia."
+        },
+        new()
+        {
+            Id = "large-v3-turbo",
+            DisplayName = "Large v3 Turbo",
+            GgmlType = GgmlType.LargeV3Turbo,
+            FileName = "ggml-large-v3-turbo.bin",
+            SizeLabel = "~1,6 GB",
+            SpeedLabel = "Media-alta",
+            QualityLabel = "Muy alta",
+            SpeedScore = 3,
+            QualityScore = 4,
+            Description = "Calidad cercana a Large, más rápida que Large v2/v3 completo."
+        },
     ];
 
     [ObservableProperty]

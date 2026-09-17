@@ -5,6 +5,7 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
+        <converters:BoolToVisConverter x:Key="BoolToVisConverter"/>
 
         <Color x:Key="BgColor">#F4F7F5</Color>
         <Color x:Key="CardColor">#FFFFFF</Color>

@@ -7,7 +7,7 @@ public sealed class ModelDownloader
 {
     private static readonly HttpClient Http = new()
     {
-        Timeout = TimeSpan.FromMinutes(30)
+        Timeout = TimeSpan.FromHours(2)
     };
 
     private static readonly Dictionary<GgmlType, string> ModelUrls = new()
@@ -15,6 +15,10 @@ public sealed class ModelDownloader
         [GgmlType.Tiny] = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin",
         [GgmlType.Base] = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin",
         [GgmlType.Small] = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin",
+        [GgmlType.Medium] = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin",
+        [GgmlType.LargeV2] = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v2.bin",
+        [GgmlType.LargeV3] = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin",
+        [GgmlType.LargeV3Turbo] = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin",
     };
 
     public string GetModelPath(GgmlType type, string fileName) =>
@@ -31,7 +35,19 @@ public sealed class ModelDownloader
     {
         AppPaths.EnsureDirectories();
         var path = GetModelPath(type, fileName);
-        if (System.IO.File.Exists(path) && new System.IO.FileInfo(path).Length > 1_000_000)
+
+        // Umbral mínimo por modelo para no dar por válido un download a medias
+        var minBytes = type switch
+        {
+            GgmlType.Tiny => 20_000_000L,
+            GgmlType.Base => 100_000_000L,
+            GgmlType.Small => 200_000_000L,
+            GgmlType.Medium => 500_000_000L,
+            GgmlType.LargeV2 or GgmlType.LargeV3 => 1_000_000_000L,
+            GgmlType.LargeV3Turbo => 500_000_000L,
+            _ => 1_000_000L
+        };
+        if (System.IO.File.Exists(path) && new System.IO.FileInfo(path).Length > minBytes)
             return;
 
         if (!ModelUrls.TryGetValue(type, out var url))

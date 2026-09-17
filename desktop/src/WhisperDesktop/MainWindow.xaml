@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:WhisperDesktop.ViewModels"
         Title="Whisper Desktop — Transcripción local"
-        Height="720" Width="980"
-        MinHeight="560" MinWidth="760"
+        Height="820" Width="1000"
+        MinHeight="640" MinWidth="820"
         AllowDrop="True"
         Drop="Window_Drop"
         DragOver="Window_DragOver"
@@ -18,13 +18,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="160"/>
+            <RowDefinition Height="120"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
             <TextBlock Text="Whisper Desktop"
                        FontSize="28" FontWeight="SemiBold"
                        Foreground="{StaticResource TextPrimary}"/>
@@ -33,37 +34,23 @@
                        Foreground="{StaticResource TextSecondary}"/>
         </StackPanel>
 
-        <!-- Controls -->
-        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="16" Margin="0,0,0,12">
+        <!-- Language + output -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="16" Margin="0,0,0,10">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="220"/>
                     <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Grid.Column="0">
+                <StackPanel Grid.Column="0">
                     <TextBlock Text="Idioma" Style="{StaticResource FieldLabel}"/>
                     <ComboBox ItemsSource="{Binding Languages}"
                               SelectedItem="{Binding SelectedLanguage}"
                               Margin="0,4,0,0"/>
                 </StackPanel>
 
-                <StackPanel Grid.Row="0" Grid.Column="2">
-                    <TextBlock Text="Modelo" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Models}"
-                              SelectedItem="{Binding SelectedModel}"
-                              Margin="0,4,0,0"/>
-                </StackPanel>
-
-                <StackPanel Grid.Row="0" Grid.Column="4">
+                <StackPanel Grid.Column="2">
                     <TextBlock Text="Carpeta de salida" Style="{StaticResource FieldLabel}"/>
                     <DockPanel Margin="0,4,0,0">
                         <Button DockPanel.Dock="Right" Content="…" Width="36" Margin="6,0,0,0"
@@ -72,8 +59,125 @@
                                  VerticalContentAlignment="Center"/>
                     </DockPanel>
                 </StackPanel>
+            </Grid>
+        </Border>
 
-                <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,14,0,0">
+        <!-- Model picker -->
+        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="16" Margin="0,0,0,10">
+            <StackPanel>
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="Modelo de Whisper" Style="{StaticResource FieldLabel}"
+                               DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                    <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right"
+                               Text="Todos son gratis y privados. Más grande = mejor calidad, más descarga y más tiempo."
+                               Foreground="{StaticResource TextSecondary}" FontSize="12" TextWrapping="Wrap"/>
+                </DockPanel>
+
+                <ListBox ItemsSource="{Binding Models}"
+                         SelectedItem="{Binding SelectedModel}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         MaxHeight="220">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="2"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,0,8,8"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Bd"
+                                                Background="#F7FAF8"
+                                                BorderBrush="#D0D9D3"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="12"
+                                                Cursor="Hand">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#E5F2EC"/>
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#1F6F5B"/>
+                                                <Setter TargetName="Bd" Property="BorderThickness" Value="2"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#EEF5F1"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="14"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                    <Border Margin="8,0,0,0" Padding="6,1" CornerRadius="4"
+                                            Background="#1F6F5B" VerticalAlignment="Center"
+                                            Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVisConverter}}">
+                                        <TextBlock Text="Recomendado" Foreground="White" FontSize="10" FontWeight="SemiBold"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding SizeLabel}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource AccentBrush}"
+                                           VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="1" Grid.ColumnSpan="2"
+                                           Text="{Binding Description}"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           FontSize="11" TextWrapping="Wrap" Margin="0,4,0,6"/>
+
+                                <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,2">
+                                    <TextBlock Text="Velocidad" Width="70" FontSize="11"
+                                               Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding SpeedDots}" FontSize="12"
+                                               Foreground="#2C7A5F" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding SpeedLabel}" FontSize="11" Margin="8,0,0,0"
+                                               Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                    <TextBlock Text="Calidad" Width="70" FontSize="11"
+                                               Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding QualityDots}" FontSize="12"
+                                               Foreground="#1F6F5B" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding QualityLabel}" FontSize="11" Margin="8,0,0,0"
+                                               Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock Margin="0,2,0,10" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                           Text="La primera vez que elijas un modelo se descarga a tu PC; después queda disponible sin internet."/>
+
+                <StackPanel Orientation="Horizontal">
                     <Button Content="Elegir archivos" Command="{Binding ChooseFilesCommand}"
                             Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
                     <Button Content="Transcribir" Command="{Binding StartCommand}"
@@ -83,15 +187,14 @@
                     <Button Content="Limpiar finalizados" Command="{Binding ClearCompletedCommand}"/>
                 </StackPanel>
 
-                <TextBlock Grid.Row="2" Grid.ColumnSpan="5"
-                           Text="{Binding FfmpegStatus}"
+                <TextBlock Text="{Binding FfmpegStatus}"
                            Foreground="{StaticResource TextSecondary}"
                            FontSize="12" Margin="0,10,0,0" TextWrapping="Wrap"/>
-            </Grid>
+            </StackPanel>
         </Border>
 
         <!-- Drop zone + job list -->
-        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+        <Border Grid.Row="3" Style="{StaticResource Card}" Padding="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -149,9 +252,9 @@
             </Grid>
         </Border>
 
-        <TextBlock Grid.Row="3" Text="Actividad" Style="{StaticResource FieldLabel}" Margin="0,12,0,6"/>
+        <TextBlock Grid.Row="4" Text="Actividad" Style="{StaticResource FieldLabel}" Margin="0,12,0,6"/>
 
-        <TextBox Grid.Row="4"
+        <TextBox Grid.Row="5"
                  Text="{Binding StatusLog}"
                  IsReadOnly="True"
                  TextWrapping="Wrap"

@@ -132,20 +132,27 @@ Forzar el idioma correcto suele dar mejores resultados que la detección automá
 
 ### Modelo
 
-| Modelo | Velocidad | Calidad | Tamaño aprox. |
-|--------|-----------|---------|----------------|
-| **Tiny** | Muy rápida | Baja | ~75 MB |
-| **Base** (recomendado) | Rápida | Buena | ~140 MB |
-| **Small** | Más lenta | Mejor | ~460 MB |
+Todos los modelos son **gratis y privados** (corren en tu PC). La app muestra tamaño, velocidad y calidad para que elijas:
+
+| Modelo | Descarga aprox. | Velocidad | Calidad |
+|--------|-----------------|-----------|---------|
+| **Tiny** | ~75 MB | Muy rápida | Básica |
+| **Base** (recomendado) | ~140 MB | Rápida | Buena |
+| **Small** | ~460 MB | Moderada | Muy buena |
+| **Medium** | ~1,5 GB | Lenta | Alta |
+| **Large v2 / v3** | ~3 GB | Muy lenta | Máxima |
+| **Large v3 Turbo** | ~1,6 GB | Media-alta | Muy alta |
+
+Cuanto más grande el modelo, mejor suele ser el texto, pero:
+- la **primera vez** descarga más datos,
+- la transcripción en CPU **tarda más**,
+- necesitás más espacio en disco (y RAM en los Large).
 
 La primera vez que uses un modelo, la app lo descarga y lo deja en:
 
 `%LocalAppData%\WhisperDesktop\models\`
 
 Después no hace falta volver a bajarlo.
-
-> Archivos largos en CPU pueden tardar varios minutos. Con **Small** tarda más, pero suele entender mejor audio difícil (ruido, acentos, juntas).
-
 ---
 
 ## Dónde se guardan los archivos
